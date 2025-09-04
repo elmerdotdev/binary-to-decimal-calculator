@@ -21,7 +21,8 @@ function createInput(power, prepend = true) {
   input.className = "form-control text-center fs-5";
 
   const label = document.createElement("label");
-  label.innerHTML = `2<sup>${power}</sup>`;
+  const decimalValue = Math.pow(2, power);
+  label.innerHTML = `<strong>2<sup>${power}</sup></strong><br><em class="small text-muted">${decimalValue}</em>`;
   label.className = "mt-1";
 
   field.appendChild(input);
