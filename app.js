@@ -9,7 +9,7 @@ let highestPower = 2; // default
 
 function createInput(power, prepend = true) {
   const field = document.createElement("div");
-  field.className = "d-flex flex-column align-items-center mx-2 mb-2 bit-container";
+  field.className = "d-flex flex-column align-items-center mx-1 mb-2 bit-container";
 
   const input = document.createElement("input");
   input.type = "text";
@@ -31,6 +31,23 @@ function createInput(power, prepend = true) {
   } else {
     inputsDiv.appendChild(field);
   }
+
+  input.addEventListener("keydown", (e) => {
+    const inputs = Array.from(inputsDiv.querySelectorAll("input"));
+    const currentIndex = inputs.indexOf(e.target);
+
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      if (currentIndex > 0) {
+        inputs[currentIndex - 1].focus();
+      }
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      if (currentIndex < inputs.length - 1) {
+        inputs[currentIndex + 1].focus();
+      }
+    }
+  });
 
   input.addEventListener("input", () => {
     if (input.value !== "0" && input.value !== "1") {
@@ -56,6 +73,22 @@ function calculate() {
   localStorage.setItem("binaryValue", binaryString);
 }
 
+function updateSpacers() {
+  inputsDiv.querySelectorAll(".spacer").forEach(spacer => spacer.remove());
+
+  const bitContainers = inputsDiv.querySelectorAll(".bit-container");
+  bitContainers.forEach(container => {
+    const input = container.querySelector("input");
+    const power = parseInt(input.dataset.power, 10);
+    if (power > 0 && (power + 1) % 4 === 0) {
+      const spacer = document.createElement("div");
+      spacer.className = "spacer";
+      spacer.style.width = "0rem";
+      inputsDiv.insertBefore(spacer, container);
+    }
+  });
+}
+
 function loadFromLocalStorage() {
   const savedBinary = localStorage.getItem("binaryValue");
   inputsDiv.innerHTML = "";
@@ -75,6 +108,7 @@ function loadFromLocalStorage() {
       createInput(i, false);
     }
   }
+  updateSpacers();
 }
 
 
@@ -82,6 +116,7 @@ addButton.addEventListener("click", () => {
   highestPower++;
   createInput(highestPower, true);
   calculate();
+  updateSpacers();
 });
 
 removeButton.addEventListener("click", () => {
@@ -91,6 +126,7 @@ removeButton.addEventListener("click", () => {
       inputsDiv.removeChild(firstInput);
       highestPower--;
       calculate();
+      updateSpacers();
     }
   }
 });
