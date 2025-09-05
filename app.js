@@ -117,13 +117,11 @@ copyButton.addEventListener('click', function() {
 })
 
 resetButton.addEventListener('click', function() {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach(input => {
+    input.value = ""
+  });
   localStorage.removeItem("binaryValue");
-  // After resetting, we should go back to the default state
-  inputsDiv.innerHTML = "";
-  highestPower = 2;
-  for (let i = highestPower; i >= 0; i--) {
-    createInput(i, false);
-  }
   calculate();
 })
 
