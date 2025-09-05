@@ -32,6 +32,10 @@ function createInput(power, prepend = true) {
     inputsDiv.appendChild(field);
   }
 
+  input.addEventListener('focus', (e) => {
+    e.target.select();
+  });
+
   input.addEventListener("keydown", (e) => {
     const inputs = Array.from(inputsDiv.querySelectorAll("input"));
     const currentIndex = inputs.indexOf(e.target);
