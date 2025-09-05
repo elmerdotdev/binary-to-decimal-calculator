@@ -103,7 +103,15 @@ copyButton.addEventListener('click', function() {
     currentBits += value;
   })
 
-  navigator.clipboard.writeText(currentBits).then(() => {
+  let trimmedBits = currentBits;
+  const firstOne = trimmedBits.indexOf('1');
+  if (firstOne > -1) {
+    trimmedBits = trimmedBits.substring(firstOne);
+  } else {
+    trimmedBits = "0";
+  }
+
+  navigator.clipboard.writeText(trimmedBits).then(() => {
     const originalText = copyButton.textContent;
     copyButton.textContent = "Copied!";
     copyButton.classList.add("btn-success")
