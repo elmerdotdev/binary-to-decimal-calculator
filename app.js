@@ -5,12 +5,7 @@ const removeButton = document.getElementById("removeBit");
 const copyButton = document.getElementById("copy");
 const resetButton = document.getElementById("reset");
 
-let highestPower = 2; // start with 8 bits
-
-// Create initial 3 inputs
-for (let i = highestPower; i >= 0; i--) {
-  createInput(i, false); // append to rightmost
-}
+let highestPower = 2; // default
 
 function createInput(power, prepend = true) {
   const field = document.createElement("div");
@@ -37,57 +32,74 @@ function createInput(power, prepend = true) {
     inputsDiv.appendChild(field);
   }
 
-  // Validate input to allow only 0 or 1
   input.addEventListener("input", () => {
     if (input.value !== "0" && input.value !== "1") {
-      input.value = ""; // clear invalid input
+      input.value = "";
     }
     calculate();
   });
-
-  // updateTabIndices();
 }
+
+function calculate() {
+  let total = 0;
+  let binaryString = "";
+  const inputs = inputsDiv.querySelectorAll("input");
+  inputs.forEach(input => {
+    const val = input.value.trim() || "0";
+    binaryString += val;
+    const power = parseInt(input.dataset.power, 10);
+    if (input.value.trim() === "1") {
+        total += Math.pow(2, power);
+    }
+  });
+  resultBox.textContent = `Decimal Value: ${total}`;
+  localStorage.setItem("binaryValue", binaryString);
+}
+
+function loadFromLocalStorage() {
+  const savedBinary = localStorage.getItem("binaryValue");
+  inputsDiv.innerHTML = "";
+  if (savedBinary && savedBinary.length > 0) {
+    highestPower = savedBinary.length - 1;
+    for (let i = highestPower; i >= 0; i--) {
+      createInput(i, false);
+    }
+    const inputs = inputsDiv.querySelectorAll("input");
+    for (let i = 0; i < savedBinary.length; i++) {
+      inputs[i].value = savedBinary[i];
+    }
+    calculate();
+  } else {
+    highestPower = 2;
+    for (let i = highestPower; i >= 0; i--) {
+      createInput(i, false);
+    }
+  }
+}
+
 
 addButton.addEventListener("click", () => {
   highestPower++;
   createInput(highestPower, true);
+  calculate();
 });
 
 removeButton.addEventListener("click", () => {
   if (highestPower > 0) {
-    const inputs = inputsDiv.querySelectorAll(".bit-container");
-    const firstInput = inputs[0];
+    const firstInput = inputsDiv.querySelector(".bit-container");
     if (firstInput) {
       inputsDiv.removeChild(firstInput);
       highestPower--;
       calculate();
-      // updateTabIndices();
     }
   }
 });
-
-function calculate() {
-  let total = 0;
-  document.querySelectorAll("input").forEach(input => {
-    const val = input.value.trim();
-    const power = parseInt(input.dataset.power, 10);
-    if (val === "1") total += Math.pow(2, power);
-  });
-  resultBox.textContent = `Decimal Value: ${total}`;
-}
-
-// function updateTabIndices() {
-//   const inputs = document.querySelectorAll("input");
-//   inputs.forEach((input, index) => {
-//     input.tabIndex = inputs.length - index; // rightmost = tab first
-//   });
-// }
 
 copyButton.addEventListener('click', function() {
   const inputs = document.querySelectorAll("input");
   let currentBits = "";
   inputs.forEach(input => {
-    const value = input.value || 0;
+    const value = input.value || "0";
     currentBits += value;
   })
 
@@ -105,9 +117,14 @@ copyButton.addEventListener('click', function() {
 })
 
 resetButton.addEventListener('click', function() {
-  const inputs = document.querySelectorAll("input");
-  inputs.forEach(input => {
-    input.value = ""
-  });
-  resultBox.textContent = "Decimal Value: 0"
+  localStorage.removeItem("binaryValue");
+  // After resetting, we should go back to the default state
+  inputsDiv.innerHTML = "";
+  highestPower = 2;
+  for (let i = highestPower; i >= 0; i--) {
+    createInput(i, false);
+  }
+  calculate();
 })
+
+loadFromLocalStorage();
