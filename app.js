@@ -1,10 +1,12 @@
 const inputsDiv = document.getElementById("inputs");
 const resultBox = document.getElementById("result");
 const addButton = document.getElementById("addBit");
+const resetButton = document.getElementById("reset");
+const removeButton = document.getElementById("removeBit");
 
-let highestPower = 7; // start with 8 bits
+let highestPower = 2; // start with 8 bits
 
-// Create initial 8 inputs
+// Create initial 3 inputs
 for (let i = highestPower; i >= 0; i--) {
   createInput(i, false); // append to rightmost
 }
@@ -50,6 +52,19 @@ addButton.addEventListener("click", () => {
   createInput(highestPower, true);
 });
 
+removeButton.addEventListener("click", () => {
+  if (highestPower > 0) {
+    const inputs = inputsDiv.querySelectorAll(".d-flex.flex-column.align-items-center.mx-2.mb-1");
+    const firstInput = inputs[0];
+    if (firstInput) {
+      inputsDiv.removeChild(firstInput);
+      highestPower--;
+      calculate();
+      updateTabIndices();
+    }
+  }
+});
+
 function calculate() {
   let total = 0;
   document.querySelectorAll("input").forEach(input => {
@@ -66,3 +81,11 @@ function updateTabIndices() {
     input.tabIndex = inputs.length - index; // rightmost = tab first
   });
 }
+
+resetButton.addEventListener('click', function() {
+  const inputs = document.querySelectorAll("input");
+  inputs.forEach((input) => {
+    input.value = ""
+  });
+  resultBox.textContent = "Decimal Value: 0"
+})
