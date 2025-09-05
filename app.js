@@ -1,8 +1,9 @@
 const inputsDiv = document.getElementById("inputs");
 const resultBox = document.getElementById("result");
 const addButton = document.getElementById("addBit");
-const resetButton = document.getElementById("reset");
 const removeButton = document.getElementById("removeBit");
+const copyButton = document.getElementById("copy");
+const resetButton = document.getElementById("reset");
 
 let highestPower = 2; // start with 8 bits
 
@@ -13,7 +14,7 @@ for (let i = highestPower; i >= 0; i--) {
 
 function createInput(power, prepend = true) {
   const field = document.createElement("div");
-  field.className = "d-flex flex-column align-items-center mx-2 mb-1";
+  field.className = "d-flex flex-column align-items-center mx-2 mb-2 bit-container";
 
   const input = document.createElement("input");
   input.type = "text";
@@ -44,7 +45,7 @@ function createInput(power, prepend = true) {
     calculate();
   });
 
-  updateTabIndices();
+  // updateTabIndices();
 }
 
 addButton.addEventListener("click", () => {
@@ -54,13 +55,13 @@ addButton.addEventListener("click", () => {
 
 removeButton.addEventListener("click", () => {
   if (highestPower > 0) {
-    const inputs = inputsDiv.querySelectorAll(".d-flex.flex-column.align-items-center.mx-2.mb-1");
+    const inputs = inputsDiv.querySelectorAll(".bit-container");
     const firstInput = inputs[0];
     if (firstInput) {
       inputsDiv.removeChild(firstInput);
       highestPower--;
       calculate();
-      updateTabIndices();
+      // updateTabIndices();
     }
   }
 });
@@ -75,16 +76,37 @@ function calculate() {
   resultBox.textContent = `Decimal Value: ${total}`;
 }
 
-function updateTabIndices() {
+// function updateTabIndices() {
+//   const inputs = document.querySelectorAll("input");
+//   inputs.forEach((input, index) => {
+//     input.tabIndex = inputs.length - index; // rightmost = tab first
+//   });
+// }
+
+copyButton.addEventListener('click', function() {
   const inputs = document.querySelectorAll("input");
-  inputs.forEach((input, index) => {
-    input.tabIndex = inputs.length - index; // rightmost = tab first
+  let currentBits = "";
+  inputs.forEach(input => {
+    const value = input.value || 0;
+    currentBits += value;
+  })
+
+  navigator.clipboard.writeText(currentBits).then(() => {
+    const originalText = copyButton.textContent;
+    copyButton.textContent = "Copied!";
+    copyButton.classList.add("btn-success")
+    setTimeout(() => {
+      copyButton.textContent = originalText;
+      copyButton.classList.remove("btn-success")
+    }, 2000);
+  }).catch(err => {
+    console.error('Failed to copy bits: ', err);
   });
-}
+})
 
 resetButton.addEventListener('click', function() {
   const inputs = document.querySelectorAll("input");
-  inputs.forEach((input) => {
+  inputs.forEach(input => {
     input.value = ""
   });
   resultBox.textContent = "Decimal Value: 0"
